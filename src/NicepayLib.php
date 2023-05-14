@@ -10,9 +10,12 @@ class NicepayLib extends NicepayConfig
     public $requestData = [];
     public $notification = [];
 
+    public $request;
+
     public function __construct()
     {
-        self::registerNicepayConfig();
+        $this->registerNicepayConfig();
+        $this->request = new NicepayRequestor;
     }
 
     protected function registerNicepayConfig()
@@ -37,662 +40,662 @@ class NicepayLib extends NicepayConfig
     }
 
     // Charge Credit Card
-    public static function requestCC($requestData)
+    public function requestCC($requestData)
     {
         // Populate data
         foreach ($requestData as $key => $value) {
-            self::set($key, $value);
+            $this->set($key, $value);
         }
-        self::set('timeStamp', date('YmdHis'));
-        self::set('iMid', self::getMerchantId());
-        self::set('merchantKey', self::getMerchantKey());
-        self::set('merchantToken', self::getMerchantToken());
-        unset(self::$requestData['merchantKey']);
+        $this->set('timeStamp', date('YmdHis'));
+        $this->set('iMid', $this->getMerchantId());
+        $this->set('merchantKey', $this->getMerchantKey());
+        $this->set('merchantToken', $this->getMerchantToken());
+        unset($this->requestData['merchantKey']);
 
-        self::set('dbProcessUrl', self::getNotificationUrl());
-        self::set('callBackUrl', self::getCallbackUrl());
-        self::set('userIP', self::getUserIP());
-        self::set('goodsNm', self::get('description'));
-        self::set('notaxAmt', '0');
-        self::set('reqDomain', 'http://localhost/');
+        $this->set('dbProcessUrl', $this->getNotificationUrl());
+        // $this->set('callBackUrl', $this->getCallbackUrl());
+        $this->set('userIP', $this->getUserIP());
+        $this->set('goodsNm', $this->get('description'));
+        $this->set('notaxAmt', '0');
+        $this->set('reqDomain', 'http://localhost/');
 
-        if (self::get('fee') == '') {
-            self::set('fee', '0');
+        if ($this->get('fee') == '') {
+            $this->set('fee', '0');
         }
-        if (self::get('vat') == '') {
-            self::set('vat', '0');
+        if ($this->get('vat') == '') {
+            $this->set('vat', '0');
         }
-        if (self::get('cartData') == '') {
-            self::set('cartData', "{\"count\": \"1\",\"item\": [{\"img_url\": \"https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone11-select-2019-family?wid=882&amp;hei=1058&amp;fmt=jpeg&amp;qlt=80&amp;op_usm=0.5,0.5&amp;.v=1567022175704\",\"goods_name\": \" iPhone 11 \",\"goods_detail\": \"A new dual‑camera system captures more of what you see and love. The fastest chip ever in a smartphone and all‑day battery life let you do more and charge less. And the highest‑quality video in a smartphone, so your memories look better than ever.\",\"goods_amt\":" . "\"" . self::get('amt') . "\"}]}");
+        if ($this->get('cartData') == '') {
+            $this->set('cartData', "{\"count\": \"1\",\"item\": [{\"img_url\": \"https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone11-select-2019-family?wid=882&amp;hei=1058&amp;fmt=jpeg&amp;qlt=80&amp;op_usm=0.5,0.5&amp;.v=1567022175704\",\"goods_name\": \" iPhone 11 \",\"goods_detail\": \"A new dual‑camera system captures more of what you see and love. The fastest chip ever in a smartphone and all‑day battery life let you do more and charge less. And the highest‑quality video in a smartphone, so your memories look better than ever.\",\"goods_amt\":" . "\"" . $this->get('amt') . "\"}]}");
         }
 
         // Check Parameter
-        self::checkParam('timeStamp', '01');
-        self::checkParam('iMid', '02');
-        self::checkParam('payMethod', '03');
-        self::checkParam('currency', '04');
-        self::checkParam('amt', '05');
-        self::checkParam('referenceNo', '06');
-        self::checkParam('goodsNm', '07');
-        self::checkParam('billingNm', '08');
-        self::checkParam('billingPhone', '09');
-        self::checkParam('billingEmail', '10');
-        self::checkParam('billingAddr', '11');
-        self::checkParam('billingCity', '12');
-        self::checkParam('billingState', '13');
-        self::checkParam('billingPostCd', '14');
-        self::checkParam('billingCountry', '15');
-        self::checkParam('deliveryNm', '16');
-        self::checkParam('deliveryPhone', '17');
-        self::checkParam('deliveryAddr', '18');
-        self::checkParam('deliveryCity', '19');
-        self::checkParam('deliveryState', '20');
-        self::checkParam('deliveryPostCd', '21');
-        self::checkParam('deliveryCountry', '22');
-        self::checkParam('dbProcessUrl', '23');
-        self::checkParam('vat', '24');
-        self::checkParam('fee', '25');
-        self::checkParam('notaxAmt', '26');
-        self::checkParam('description', '27');
-        self::checkParam('merchantToken', '28');
-        self::checkParam('reqDt', '29');
-        self::checkParam('reqTm', '30');
-        self::checkParam('userIP', '34');
-        self::checkParam('cartData', '38');
+        $this->checkParam('timeStamp', '01');
+        $this->checkParam('iMid', '02');
+        $this->checkParam('payMethod', '03');
+        $this->checkParam('currency', '04');
+        $this->checkParam('amt', '05');
+        $this->checkParam('referenceNo', '06');
+        $this->checkParam('goodsNm', '07');
+        $this->checkParam('billingNm', '08');
+        $this->checkParam('billingPhone', '09');
+        $this->checkParam('billingEmail', '10');
+        $this->checkParam('billingAddr', '11');
+        $this->checkParam('billingCity', '12');
+        $this->checkParam('billingState', '13');
+        $this->checkParam('billingPostCd', '14');
+        $this->checkParam('billingCountry', '15');
+        $this->checkParam('deliveryNm', '16');
+        $this->checkParam('deliveryPhone', '17');
+        $this->checkParam('deliveryAddr', '18');
+        $this->checkParam('deliveryCity', '19');
+        $this->checkParam('deliveryState', '20');
+        $this->checkParam('deliveryPostCd', '21');
+        $this->checkParam('deliveryCountry', '22');
+        $this->checkParam('dbProcessUrl', '23');
+        $this->checkParam('vat', '24');
+        $this->checkParam('fee', '25');
+        $this->checkParam('notaxAmt', '26');
+        $this->checkParam('description', '27');
+        $this->checkParam('merchantToken', '28');
+        $this->checkParam('reqDt', '29');
+        $this->checkParam('reqTm', '30');
+        $this->checkParam('userIP', '34');
+        $this->checkParam('cartData', '38');
 
         // Send Request
-        $resultData = NicepayRequestor::apiRequest(NicepayConfig::NICEPAY_REQ_URL, self::$requestData);
-        unset(self::$requestData);
+        $resultData = $this->request->apiRequest(NicepayConfig::NICEPAY_REQ_URL, $this->requestData);
+        unset($this->requestData);
 
         return $resultData;
     }
 
     // Request Virtual Account
-    public static function requestVA($requestData)
+    public function requestVA($requestData)
     {
         // Populate data
         foreach ($requestData as $key => $value) {
-            self::set($key, $value);
+            $this->set($key, $value);
         }
-        self::set('timeStamp', date('YmdHis'));
-        self::set('iMid', self::getMerchantId());
-        self::set('merchantKey', self::getMerchantKey());
-        self::set('merchantToken', self::getMerchantToken());
-        unset(self::$requestData['merchantKey']);
+        $this->set('timeStamp', date('YmdHis'));
+        $this->set('iMid', $this->getMerchantId());
+        $this->set('merchantKey', $this->getMerchantKey());
+        $this->set('merchantToken', $this->getMerchantToken());
+        unset($this->requestData['merchantKey']);
 
-        self::set('dbProcessUrl', self::getNotificationUrl());
-        self::set('callBackUrl', self::getCallbackUrl());
-        self::set('userIP', self::getUserIP());
-        self::set('goodsNm', self::get('description'));
-        self::set('notaxAmt', '0');
-        self::set('reqDomain', 'http://localhost/');
+        $this->set('dbProcessUrl', $this->getNotificationUrl());
+        // $this->set('callBackUrl', $this->getCallbackUrl());
+        $this->set('userIP', $this->getUserIP());
+        $this->set('goodsNm', $this->get('description'));
+        $this->set('notaxAmt', '0');
+        $this->set('reqDomain', 'http://localhost/');
 
-        if (self::get('fee') == '') {
-            self::set('fee', '0');
+        if ($this->get('fee') == '') {
+            $this->set('fee', '0');
         }
-        if (self::get('vat') == '') {
-            self::set('vat', '0');
+        if ($this->get('vat') == '') {
+            $this->set('vat', '0');
         }
-        if (self::get('cartData') == '') {
-            self::set('cartData', '{}');
+        if ($this->get('cartData') == '') {
+            $this->set('cartData', '{}');
         }
 
         // Check Parameter
-        self::checkParam('timeStamp', '01');
-        self::checkParam('iMid', '02');
-        self::checkParam('payMethod', '03');
-        self::checkParam('currency', '04');
-        self::checkParam('amt', '05');
-        self::checkParam('referenceNo', '06');
-        self::checkParam('goodsNm', '07');
-        self::checkParam('billingNm', '08');
-        self::checkParam('billingPhone', '09');
-        self::checkParam('billingEmail', '10');
-        self::checkParam('billingAddr', '11');
-        self::checkParam('billingCity', '12');
-        self::checkParam('billingState', '13');
-        self::checkParam('billingPostCd', '14');
-        self::checkParam('billingCountry', '15');
-        self::checkParam('deliveryNm', '16');
-        self::checkParam('deliveryPhone', '17');
-        self::checkParam('deliveryAddr', '18');
-        self::checkParam('deliveryCity', '19');
-        self::checkParam('deliveryState', '20');
-        self::checkParam('deliveryPostCd', '21');
-        self::checkParam('deliveryCountry', '22');
-        self::checkParam('dbProcessUrl', '23');
-        self::checkParam('vat', '24');
-        self::checkParam('fee', '25');
-        self::checkParam('notaxAmt', '26');
-        self::checkParam('description', '27');
-        self::checkParam('merchantToken', '28');
-        self::checkParam('reqDt', '29');
-        self::checkParam('reqTm', '30');
-        self::checkParam('userIP', '34');
-        self::checkParam('cartData', '38');
-        self::checkParam('bankCd', '42');
-        self::checkParam('vacctValidDt', '43');
-        self::checkParam('vacctValidTm', '44');
+        $this->checkParam('timeStamp', '01');
+        $this->checkParam('iMid', '02');
+        $this->checkParam('payMethod', '03');
+        $this->checkParam('currency', '04');
+        $this->checkParam('amt', '05');
+        $this->checkParam('referenceNo', '06');
+        $this->checkParam('goodsNm', '07');
+        $this->checkParam('billingNm', '08');
+        $this->checkParam('billingPhone', '09');
+        $this->checkParam('billingEmail', '10');
+        $this->checkParam('billingAddr', '11');
+        $this->checkParam('billingCity', '12');
+        $this->checkParam('billingState', '13');
+        $this->checkParam('billingPostCd', '14');
+        $this->checkParam('billingCountry', '15');
+        $this->checkParam('deliveryNm', '16');
+        $this->checkParam('deliveryPhone', '17');
+        $this->checkParam('deliveryAddr', '18');
+        $this->checkParam('deliveryCity', '19');
+        $this->checkParam('deliveryState', '20');
+        $this->checkParam('deliveryPostCd', '21');
+        $this->checkParam('deliveryCountry', '22');
+        $this->checkParam('dbProcessUrl', '23');
+        $this->checkParam('vat', '24');
+        $this->checkParam('fee', '25');
+        $this->checkParam('notaxAmt', '26');
+        $this->checkParam('description', '27');
+        $this->checkParam('merchantToken', '28');
+        $this->checkParam('reqDt', '29');
+        $this->checkParam('reqTm', '30');
+        $this->checkParam('userIP', '34');
+        $this->checkParam('cartData', '38');
+        $this->checkParam('bankCd', '42');
+        $this->checkParam('vacctValidDt', '43');
+        $this->checkParam('vacctValidTm', '44');
 
         // Send Request
-        $resultData = NicepayRequestor::apiRequest(NicepayConfig::NICEPAY_REQ_URL, self::$requestData);
-        unset(self::$requestData);
+        $resultData = $this->request->apiRequest(NicepayConfig::NICEPAY_REQ_URL, $this->requestData);
+        unset($this->requestData);
 
         return $resultData;
     }
 
     // Request CVS
-    public static function requestCVS($requestData)
+    public function requestCVS($requestData)
     {
         // Populate data
         foreach ($requestData as $key => $value) {
-            self::set($key, $value);
+            $this->set($key, $value);
         }
-        self::set('timeStamp', date('YmdHis'));
-        self::set('iMid', self::getMerchantId());
-        self::set('merchantKey', self::getMerchantKey());
-        self::set('merchantToken', self::getMerchantToken());
-        unset(self::$requestData['merchantKey']);
+        $this->set('timeStamp', date('YmdHis'));
+        $this->set('iMid', $this->getMerchantId());
+        $this->set('merchantKey', $this->getMerchantKey());
+        $this->set('merchantToken', $this->getMerchantToken());
+        unset($this->requestData['merchantKey']);
 
-        self::set('dbProcessUrl', self::getNotificationUrl());
-        self::set('callBackUrl', self::getCallbackUrl());
-        self::set('userIP', self::getUserIP());
-        self::set('goodsNm', self::get('description'));
-        self::set('notaxAmt', '0');
-        self::set('reqDomain', 'http://localhost/');
+        $this->set('dbProcessUrl', $this->getNotificationUrl());
+        // $this->set('callBackUrl', $this->getCallbackUrl());
+        $this->set('userIP', $this->getUserIP());
+        $this->set('goodsNm', $this->get('description'));
+        $this->set('notaxAmt', '0');
+        $this->set('reqDomain', 'http://localhost/');
 
-        if (self::get('fee') == "") {
-            self::set('fee', '0');
+        if ($this->get('fee') == "") {
+            $this->set('fee', '0');
         }
-        if (self::get('vat') == "") {
-            self::set('vat', '0');
+        if ($this->get('vat') == "") {
+            $this->set('vat', '0');
         }
-        if (self::get('cartData') == "") {
-            self::set('cartData', '{}');
+        if ($this->get('cartData') == "") {
+            $this->set('cartData', '{}');
         }
 
         // Check Parameter
-        self::checkParam('timeStamp', '01');
-        self::checkParam('iMid', '02');
-        self::checkParam('payMethod', '03');
-        self::checkParam('currency', '04');
-        self::checkParam('amt', '05');
-        self::checkParam('referenceNo', '06');
-        self::checkParam('goodsNm', '07');
-        self::checkParam('billingNm', '08');
-        self::checkParam('billingPhone', '09');
-        self::checkParam('billingEmail', '10');
-        self::checkParam('billingAddr', '11');
-        self::checkParam('billingCity', '12');
-        self::checkParam('billingState', '13');
-        self::checkParam('billingPostCd', '14');
-        self::checkParam('billingCountry', '15');
-        self::checkParam('deliveryNm', '16');
-        self::checkParam('deliveryPhone', '17');
-        self::checkParam('deliveryAddr', '18');
-        self::checkParam('deliveryCity', '19');
-        self::checkParam('deliveryState', '20');
-        self::checkParam('deliveryPostCd', '21');
-        self::checkParam('deliveryCountry', '22');
-        self::checkParam('dbProcessUrl', '23');
-        self::checkParam('vat', '24');
-        self::checkParam('fee', '25');
-        self::checkParam('notaxAmt', '26');
-        self::checkParam('description', '27');
-        self::checkParam('merchantToken', '28');
-        self::checkParam('reqDt', '29');
-        self::checkParam('reqTm', '30');
-        self::checkParam('userIP', '34');
-        self::checkParam('cartData', '38');
-        self::checkParam('mitraCd', '36');
-        self::checkParam('payValidDt', '43');
-        self::checkParam('payValidTm', '44');
+        $this->checkParam('timeStamp', '01');
+        $this->checkParam('iMid', '02');
+        $this->checkParam('payMethod', '03');
+        $this->checkParam('currency', '04');
+        $this->checkParam('amt', '05');
+        $this->checkParam('referenceNo', '06');
+        $this->checkParam('goodsNm', '07');
+        $this->checkParam('billingNm', '08');
+        $this->checkParam('billingPhone', '09');
+        $this->checkParam('billingEmail', '10');
+        $this->checkParam('billingAddr', '11');
+        $this->checkParam('billingCity', '12');
+        $this->checkParam('billingState', '13');
+        $this->checkParam('billingPostCd', '14');
+        $this->checkParam('billingCountry', '15');
+        $this->checkParam('deliveryNm', '16');
+        $this->checkParam('deliveryPhone', '17');
+        $this->checkParam('deliveryAddr', '18');
+        $this->checkParam('deliveryCity', '19');
+        $this->checkParam('deliveryState', '20');
+        $this->checkParam('deliveryPostCd', '21');
+        $this->checkParam('deliveryCountry', '22');
+        $this->checkParam('dbProcessUrl', '23');
+        $this->checkParam('vat', '24');
+        $this->checkParam('fee', '25');
+        $this->checkParam('notaxAmt', '26');
+        $this->checkParam('description', '27');
+        $this->checkParam('merchantToken', '28');
+        $this->checkParam('reqDt', '29');
+        $this->checkParam('reqTm', '30');
+        $this->checkParam('userIP', '34');
+        $this->checkParam('cartData', '38');
+        $this->checkParam('mitraCd', '36');
+        $this->checkParam('payValidDt', '43');
+        $this->checkParam('payValidTm', '44');
 
         // Send Request
-        $resultData = NicepayRequestor::apiRequest(NicepayConfig::NICEPAY_REQ_URL, self::$requestData);
-        unset(self::$requestData);
+        $resultData = $this->request->apiRequest(NicepayConfig::NICEPAY_REQ_URL, $this->requestData);
+        unset($this->requestData);
 
         return $resultData;
     }
 
     // Request Ewallet
-    public static function requestEWallet($requestData)
+    public function requestEWallet($requestData)
     {
         // Populate data
         foreach ($requestData as $key => $value) {
-            self::set($key, $value);
+            $this->set($key, $value);
         }
-        self::set('timeStamp', date('YmdHis'));
-        self::set('iMid', self::getMerchantId());
-        self::set('merchantKey', self::getMerchantKey());
-        self::set('merchantToken', self::getMerchantToken());
-        unset(self::$requestData['merchantKey']);
+        $this->set('timeStamp', date('YmdHis'));
+        $this->set('iMid', $this->getMerchantId());
+        $this->set('merchantKey', $this->getMerchantKey());
+        $this->set('merchantToken', $this->getMerchantToken());
+        unset($this->requestData['merchantKey']);
 
-        self::set('dbProcessUrl', self::getNotificationUrl());
-        self::set('callBackUrl', self::getCallbackUrl());
-        self::set('userIP', self::getUserIP());
-        self::set('goodsNm', self::get('description'));
-        self::set('notaxAmt', '0');
-        self::set('reqDomain', 'http://localhost/');
+        $this->set('dbProcessUrl', $this->getNotificationUrl());
+        // $this->set('callBackUrl', $this->getCallbackUrl());
+        $this->set('userIP', $this->getUserIP());
+        $this->set('goodsNm', $this->get('description'));
+        $this->set('notaxAmt', '0');
+        $this->set('reqDomain', 'http://localhost/');
 
-        if (self::get('fee') == "") {
-            self::set('fee', '0');
+        if ($this->get('fee') == "") {
+            $this->set('fee', '0');
         }
-        if (self::get('vat') == "") {
-            self::set('vat', '0');
+        if ($this->get('vat') == "") {
+            $this->set('vat', '0');
         }
-        if (self::get('cartData') == "") {
-            if (self::get('mitraCd') == "OVOE") {
-                self::set('cartData', "{\"count\": \"1\",\"item\": [{\"img_url\": \"https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone11-select-2019-family?wid=882&amp;hei=1058&amp;fmt=jpeg&amp;qlt=80&amp;op_usm=0.5,0.5&amp;.v=1567022175704\",\"goods_name\": \" iPhone 11 \",\"goods_detail\": \"A new dual‑camera system captures more of what you see and love. The fastest chip ever in a smartphone and all‑day battery life let you do more and charge less. And the highest‑quality video in a smartphone, so your memories look better than ever.\",\"goods_amt\":" . "\"" . self::get('amt') . "\"}]}");
-            } elseif (self::get('mitraCd') == "DANA") {
-                self::set('cartData', "{\"count\": \"1\",\"item\": [{\"img_url\": \"https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone11-select-2019-family?wid=882&amp;hei=1058&amp;fmt=jpeg&amp;qlt=80&amp;op_usm=0.5,0.5&amp;.v=1567022175704\",\"goods_name\": \" iPhone 11 \",\"goods_quantity\": \"1\",\"goods_detail\": \"A new dual‑camera system captures more of what you see and love. The fastest chip ever in a smartphone and all‑day battery life let you do more and charge less. And the highest‑quality video in a smartphone, so your memories look better than ever.\",\"goods_amt\":" . "\"" . self::get('amt') . "\"}]}");
-            } elseif (self::get('mitraCd') == "LINK") {
-                self::set('cartData', "{\"count\": \"1\",\"item\": [{\"img_url\": \"https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone11-select-2019-family?wid=882&amp;hei=1058&amp;fmt=jpeg&amp;qlt=80&amp;op_usm=0.5,0.5&amp;.v=1567022175704\",\"goods_name\": \" iPhone 11 \",\"goods_quantity\": \"1\",\"goods_detail\": \"A new dual‑camera system captures more of what you see and love. The fastest chip ever in a smartphone and all‑day battery life let you do more and charge less. And the highest‑quality video in a smartphone, so your memories look better than ever.\",\"goods_amt\":" . "\"" . self::get('amt') . "\"}]}");
-            } elseif (self::get('mitraCd') == "ESHP") {
-                self::set('cartData', "{\"count\": \"1\",\"item\": [{\"img_url\": \"https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone11-select-2019-family?wid=882&amp;hei=1058&amp;fmt=jpeg&amp;qlt=80&amp;op_usm=0.5,0.5&amp;.v=1567022175704\",\"goods_name\": \" iPhone 11 \",\"goods_quantity\": \"1\",\"goods_detail\": \"A new dual‑camera system captures more of what you see and love. The fastest chip ever in a smartphone and all‑day battery life let you do more and charge less. And the highest‑quality video in a smartphone, so your memories look better than ever.\",\"goods_amt\":" . "\"" . self::get('amt') . "\"}]}");
+        if ($this->get('cartData') == "") {
+            if ($this->get('mitraCd') == "OVOE") {
+                $this->set('cartData', "{\"count\": \"1\",\"item\": [{\"img_url\": \"https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone11-select-2019-family?wid=882&amp;hei=1058&amp;fmt=jpeg&amp;qlt=80&amp;op_usm=0.5,0.5&amp;.v=1567022175704\",\"goods_name\": \" iPhone 11 \",\"goods_detail\": \"A new dual‑camera system captures more of what you see and love. The fastest chip ever in a smartphone and all‑day battery life let you do more and charge less. And the highest‑quality video in a smartphone, so your memories look better than ever.\",\"goods_amt\":" . "\"" . $this->get('amt') . "\"}]}");
+            } elseif ($this->get('mitraCd') == "DANA") {
+                $this->set('cartData', "{\"count\": \"1\",\"item\": [{\"img_url\": \"https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone11-select-2019-family?wid=882&amp;hei=1058&amp;fmt=jpeg&amp;qlt=80&amp;op_usm=0.5,0.5&amp;.v=1567022175704\",\"goods_name\": \" iPhone 11 \",\"goods_quantity\": \"1\",\"goods_detail\": \"A new dual‑camera system captures more of what you see and love. The fastest chip ever in a smartphone and all‑day battery life let you do more and charge less. And the highest‑quality video in a smartphone, so your memories look better than ever.\",\"goods_amt\":" . "\"" . $this->get('amt') . "\"}]}");
+            } elseif ($this->get('mitraCd') == "LINK") {
+                $this->set('cartData', "{\"count\": \"1\",\"item\": [{\"img_url\": \"https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone11-select-2019-family?wid=882&amp;hei=1058&amp;fmt=jpeg&amp;qlt=80&amp;op_usm=0.5,0.5&amp;.v=1567022175704\",\"goods_name\": \" iPhone 11 \",\"goods_quantity\": \"1\",\"goods_detail\": \"A new dual‑camera system captures more of what you see and love. The fastest chip ever in a smartphone and all‑day battery life let you do more and charge less. And the highest‑quality video in a smartphone, so your memories look better than ever.\",\"goods_amt\":" . "\"" . $this->get('amt') . "\"}]}");
+            } elseif ($this->get('mitraCd') == "ESHP") {
+                $this->set('cartData', "{\"count\": \"1\",\"item\": [{\"img_url\": \"https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone11-select-2019-family?wid=882&amp;hei=1058&amp;fmt=jpeg&amp;qlt=80&amp;op_usm=0.5,0.5&amp;.v=1567022175704\",\"goods_name\": \" iPhone 11 \",\"goods_quantity\": \"1\",\"goods_detail\": \"A new dual‑camera system captures more of what you see and love. The fastest chip ever in a smartphone and all‑day battery life let you do more and charge less. And the highest‑quality video in a smartphone, so your memories look better than ever.\",\"goods_amt\":" . "\"" . $this->get('amt') . "\"}]}");
             }
         }
 
         // Check Parameter
-        self::checkParam('timeStamp', '01');
-        self::checkParam('iMid', '02');
-        self::checkParam('payMethod', '03');
-        self::checkParam('currency', '04');
-        self::checkParam('amt', '05');
-        self::checkParam('referenceNo', '06');
-        self::checkParam('goodsNm', '07');
-        self::checkParam('billingNm', '08');
-        self::checkParam('billingPhone', '09');
-        self::checkParam('billingEmail', '10');
-        self::checkParam('billingAddr', '11');
-        self::checkParam('billingCity', '12');
-        self::checkParam('billingState', '13');
-        self::checkParam('billingPostCd', '14');
-        self::checkParam('billingCountry', '15');
-        self::checkParam('cartData', '38');
-        self::checkParam('mitraCd', '36');
-        self::checkParam('userIP', '34');
-        self::checkParam('dbProcessUrl', '23');
-        self::checkParam('merchantToken', '28');
+        $this->checkParam('timeStamp', '01');
+        $this->checkParam('iMid', '02');
+        $this->checkParam('payMethod', '03');
+        $this->checkParam('currency', '04');
+        $this->checkParam('amt', '05');
+        $this->checkParam('referenceNo', '06');
+        $this->checkParam('goodsNm', '07');
+        $this->checkParam('billingNm', '08');
+        $this->checkParam('billingPhone', '09');
+        $this->checkParam('billingEmail', '10');
+        $this->checkParam('billingAddr', '11');
+        $this->checkParam('billingCity', '12');
+        $this->checkParam('billingState', '13');
+        $this->checkParam('billingPostCd', '14');
+        $this->checkParam('billingCountry', '15');
+        $this->checkParam('cartData', '38');
+        $this->checkParam('mitraCd', '36');
+        $this->checkParam('userIP', '34');
+        $this->checkParam('dbProcessUrl', '23');
+        $this->checkParam('merchantToken', '28');
 
         // Send Request
-        $resultData = NicepayRequestor::apiRequest(NicepayConfig::NICEPAY_REQ_URL, self::$requestData);
-        unset(self::$requestData);
+        $resultData = $this->request->apiRequest(NicepayConfig::NICEPAY_REQ_URL, $this->requestData);
+        unset($this->requestData);
 
         return $resultData;
     }
 
     // Request QRIS
-    public static function requestQris($requestData)
+    public function requestQris($requestData)
     {
         // Populate data
         foreach ($requestData as $key => $value) {
-            self::set($key, $value);
+            $this->set($key, $value);
         }
-        self::set('timeStamp', date('YmdHis'));
-        self::set('iMid', self::getMerchantId());
-        self::set('merchantKey', self::getMerchantKey());
-        self::set('merchantToken', self::getMerchantToken());
-        unset(self::$requestData['merchantKey']);
+        $this->set('timeStamp', date('YmdHis'));
+        $this->set('iMid', $this->getMerchantId());
+        $this->set('merchantKey', $this->getMerchantKey());
+        $this->set('merchantToken', $this->getMerchantToken());
+        unset($this->requestData['merchantKey']);
 
-        self::set('dbProcessUrl', self::getNotificationUrl());
-        self::set('callBackUrl', self::getCallbackUrl());
-        self::set('userIP', self::getUserIP());
-        self::set('goodsNm', self::get('description'));
-        self::set('notaxAmt', '0');
-        self::set('reqDomain', 'http://localhost/');
+        $this->set('dbProcessUrl', $this->getNotificationUrl());
+        // $this->set('callBackUrl', $this->getCallbackUrl());
+        $this->set('userIP', $this->getUserIP());
+        $this->set('goodsNm', $this->get('description'));
+        $this->set('notaxAmt', '0');
+        $this->set('reqDomain', 'http://localhost/');
 
-        if (self::get('fee') == "") {
-            self::set('fee', '0');
+        if ($this->get('fee') == "") {
+            $this->set('fee', '0');
         }
-        if (self::get('vat') == "") {
-            self::set('vat', '0');
+        if ($this->get('vat') == "") {
+            $this->set('vat', '0');
         }
-        if (self::get('cartData') == "") {
-            self::set('cartData', '{}');
+        if ($this->get('cartData') == "") {
+            $this->set('cartData', '{}');
         }
 
         // Check Parameter
-        self::checkParam('timeStamp', '01');
-        self::checkParam('iMid', '02');
-        self::checkParam('payMethod', '03');
-        self::checkParam('currency', '04');
-        self::checkParam('amt', '05');
-        self::checkParam('referenceNo', '06');
-        self::checkParam('goodsNm', '07');
-        self::checkParam('billingNm', '08');
-        self::checkParam('billingPhone', '09');
-        self::checkParam('billingEmail', '10');
-        self::checkParam('billingAddr', '11');
-        self::checkParam('billingCity', '12');
-        self::checkParam('billingState', '13');
-        self::checkParam('billingPostCd', '14');
-        self::checkParam('billingCountry', '15');
-        self::checkParam('deliveryNm', '16');
-        self::checkParam('deliveryPhone', '17');
-        self::checkParam('deliveryAddr', '18');
-        self::checkParam('deliveryCity', '19');
-        self::checkParam('deliveryState', '20');
-        self::checkParam('deliveryPostCd', '21');
-        self::checkParam('deliveryCountry', '22');
-        self::checkParam('dbProcessUrl', '23');
-        self::checkParam('vat', '24');
-        self::checkParam('fee', '25');
-        self::checkParam('notaxAmt', '26');
-        self::checkParam('description', '27');
-        self::checkParam('merchantToken', '28');
-        self::checkParam('reqDt', '29');
-        self::checkParam('reqTm', '30');
-        self::checkParam('userIP', '34');
-        self::checkParam('cartData', '35');
-        self::checkParam('mitraCd', '36');
-        self::checkParam('shopId', '37');
+        $this->checkParam('timeStamp', '01');
+        $this->checkParam('iMid', '02');
+        $this->checkParam('payMethod', '03');
+        $this->checkParam('currency', '04');
+        $this->checkParam('amt', '05');
+        $this->checkParam('referenceNo', '06');
+        $this->checkParam('goodsNm', '07');
+        $this->checkParam('billingNm', '08');
+        $this->checkParam('billingPhone', '09');
+        $this->checkParam('billingEmail', '10');
+        $this->checkParam('billingAddr', '11');
+        $this->checkParam('billingCity', '12');
+        $this->checkParam('billingState', '13');
+        $this->checkParam('billingPostCd', '14');
+        $this->checkParam('billingCountry', '15');
+        $this->checkParam('deliveryNm', '16');
+        $this->checkParam('deliveryPhone', '17');
+        $this->checkParam('deliveryAddr', '18');
+        $this->checkParam('deliveryCity', '19');
+        $this->checkParam('deliveryState', '20');
+        $this->checkParam('deliveryPostCd', '21');
+        $this->checkParam('deliveryCountry', '22');
+        $this->checkParam('dbProcessUrl', '23');
+        $this->checkParam('vat', '24');
+        $this->checkParam('fee', '25');
+        $this->checkParam('notaxAmt', '26');
+        $this->checkParam('description', '27');
+        $this->checkParam('merchantToken', '28');
+        $this->checkParam('reqDt', '29');
+        $this->checkParam('reqTm', '30');
+        $this->checkParam('userIP', '34');
+        $this->checkParam('cartData', '35');
+        $this->checkParam('mitraCd', '36');
+        $this->checkParam('shopId', '37');
 
         // Send Request
-        $resultData = NicepayRequestor::apiRequest(NicepayConfig::NICEPAY_REQ_URL, self::$requestData);
-        unset(self::$requestData);
+        $resultData = $this->request->apiRequest(NicepayConfig::NICEPAY_REQ_URL, $this->requestData);
+        unset($this->requestData);
 
         return $resultData;
     }
 
     // Request Clickpay Jenius
-    public static function requestClickPay($requestData)
+    public function requestClickPay($requestData)
     {
         // Populate data
         foreach ($requestData as $key => $value) {
-            self::set($key, $value);
+            $this->set($key, $value);
         }
-        self::set('timeStamp', date('YmdHis'));
-        self::set('iMid', self::getMerchantId());
-        self::set('merchantKey', self::getMerchantKey());
-        self::set('merchantToken', self::getMerchantToken());
-        unset(self::$requestData['merchantKey']);
+        $this->set('timeStamp', date('YmdHis'));
+        $this->set('iMid', $this->getMerchantId());
+        $this->set('merchantKey', $this->getMerchantKey());
+        $this->set('merchantToken', $this->getMerchantToken());
+        unset($this->requestData['merchantKey']);
 
-        self::set('dbProcessUrl', self::getNotificationUrl());
-        self::set('callBackUrl', self::getCallbackUrl());
-        self::set('userIP', self::getUserIP());
-        self::set('goodsNm', self::get('description'));
-        self::set('notaxAmt', '0');
-        self::set('reqDomain', 'http://localhost/');
+        $this->set('dbProcessUrl', $this->getNotificationUrl());
+        // $this->set('callBackUrl', $this->getCallbackUrl());
+        $this->set('userIP', $this->getUserIP());
+        $this->set('goodsNm', $this->get('description'));
+        $this->set('notaxAmt', '0');
+        $this->set('reqDomain', 'http://localhost/');
 
-        if (self::get('fee') == "") {
-            self::set('fee', '0');
+        if ($this->get('fee') == "") {
+            $this->set('fee', '0');
         }
-        if (self::get('vat') == "") {
-            self::set('vat', '0');
+        if ($this->get('vat') == "") {
+            $this->set('vat', '0');
         }
-        if (self::get('cartData') == "") {
-            self::set('cartData', '{}');
+        if ($this->get('cartData') == "") {
+            $this->set('cartData', '{}');
         }
 
         // Check Parameter
-        self::checkParam('timeStamp', '01');
-        self::checkParam('iMid', '02');
-        self::checkParam('payMethod', '03');
-        self::checkParam('currency', '04');
-        self::checkParam('amt', '05');
-        self::checkParam('referenceNo', '06');
-        self::checkParam('goodsNm', '07');
-        self::checkParam('billingNm', '08');
-        self::checkParam('billingPhone', '09');
-        self::checkParam('billingEmail', '10');
-        self::checkParam('billingAddr', '11');
-        self::checkParam('billingCity', '12');
-        self::checkParam('billingState', '13');
-        self::checkParam('billingPostCd', '14');
-        self::checkParam('billingCountry', '15');
-        self::checkParam('deliveryNm', '16');
-        self::checkParam('deliveryPhone', '17');
-        self::checkParam('deliveryAddr', '18');
-        self::checkParam('deliveryCity', '19');
-        self::checkParam('deliveryState', '20');
-        self::checkParam('deliveryPostCd', '21');
-        self::checkParam('deliveryCountry', '22');
-        self::checkParam('dbProcessUrl', '23');
-        self::checkParam('vat', '24');
-        self::checkParam('fee', '25');
-        self::checkParam('notaxAmt', '26');
-        self::checkParam('description', '27');
-        self::checkParam('merchantToken', '28');
-        self::checkParam('reqDt', '29');
-        self::checkParam('reqTm', '30');
-        self::checkParam('userIP', '34');
-        self::checkParam('cartData', '35');
-        self::checkParam('mitraCd', '36');
-        // self::checkParam('cashtag', '37');
+        $this->checkParam('timeStamp', '01');
+        $this->checkParam('iMid', '02');
+        $this->checkParam('payMethod', '03');
+        $this->checkParam('currency', '04');
+        $this->checkParam('amt', '05');
+        $this->checkParam('referenceNo', '06');
+        $this->checkParam('goodsNm', '07');
+        $this->checkParam('billingNm', '08');
+        $this->checkParam('billingPhone', '09');
+        $this->checkParam('billingEmail', '10');
+        $this->checkParam('billingAddr', '11');
+        $this->checkParam('billingCity', '12');
+        $this->checkParam('billingState', '13');
+        $this->checkParam('billingPostCd', '14');
+        $this->checkParam('billingCountry', '15');
+        $this->checkParam('deliveryNm', '16');
+        $this->checkParam('deliveryPhone', '17');
+        $this->checkParam('deliveryAddr', '18');
+        $this->checkParam('deliveryCity', '19');
+        $this->checkParam('deliveryState', '20');
+        $this->checkParam('deliveryPostCd', '21');
+        $this->checkParam('deliveryCountry', '22');
+        $this->checkParam('dbProcessUrl', '23');
+        $this->checkParam('vat', '24');
+        $this->checkParam('fee', '25');
+        $this->checkParam('notaxAmt', '26');
+        $this->checkParam('description', '27');
+        $this->checkParam('merchantToken', '28');
+        $this->checkParam('reqDt', '29');
+        $this->checkParam('reqTm', '30');
+        $this->checkParam('userIP', '34');
+        $this->checkParam('cartData', '35');
+        $this->checkParam('mitraCd', '36');
+        // $this->checkParam('cashtag', '37');
 
         // Send Request
-        $resultData = NicepayRequestor::apiRequest(NicepayConfig::NICEPAY_REQ_URL, self::$requestData);
-        unset(self::$requestData);
+        $resultData = $this->request->apiRequest(NicepayConfig::NICEPAY_REQ_URL, $this->requestData);
+        unset($this->requestData);
 
         return $resultData;
     }
 
     // Request Payloan
-    public static function requestPayloan($requestData)
+    public function requestPayloan($requestData)
     {
         // Populate data
         foreach ($requestData as $key => $value) {
-            self::set($key, $value);
+            $this->set($key, $value);
         }
-        self::set('timeStamp', date('YmdHis'));
-        self::set('iMid', self::getMerchantId());
-        self::set('merchantKey', self::getMerchantKey());
-        self::set('merchantToken', self::getMerchantToken());
-        unset(self::$requestData['merchantKey']);
+        $this->set('timeStamp', date('YmdHis'));
+        $this->set('iMid', $this->getMerchantId());
+        $this->set('merchantKey', $this->getMerchantKey());
+        $this->set('merchantToken', $this->getMerchantToken());
+        unset($this->requestData['merchantKey']);
 
-        self::set('dbProcessUrl', self::getNotificationUrl());
-        self::set('callBackUrl', self::getCallbackUrl());
-        self::set('userIP', self::getUserIP());
-        self::set('notaxAmt', '0');
-        self::set('reqDomain', 'http://localhost/');
+        $this->set('dbProcessUrl', $this->getNotificationUrl());
+        // $this->set('callBackUrl', $this->getCallbackUrl());
+        $this->set('userIP', $this->getUserIP());
+        $this->set('notaxAmt', '0');
+        $this->set('reqDomain', 'http://localhost/');
 
-        if (self::get('fee') == "") {
-            self::set('fee', '0');
+        if ($this->get('fee') == "") {
+            $this->set('fee', '0');
         }
-        if (self::get('vat') == "") {
-            self::set('vat', '0');
+        if ($this->get('vat') == "") {
+            $this->set('vat', '0');
         }
 
         // Check Parameter
-        self::checkParam('timeStamp', '01');
-        self::checkParam('iMid', '02');
-        self::checkParam('payMethod', '03');
-        self::checkParam('currency', '04');
-        self::checkParam('amt', '05');
-        self::checkParam('referenceNo', '06');
-        self::checkParam('goodsNm', '07');
-        self::checkParam('billingNm', '08');
-        self::checkParam('billingPhone', '09');
-        self::checkParam('billingEmail', '10');
-        self::checkParam('billingAddr', '11');
-        self::checkParam('billingCity', '12');
-        self::checkParam('billingState', '13');
-        self::checkParam('billingPostCd', '14');
-        self::checkParam('billingCountry', '15');
-        self::checkParam('deliveryNm', '16');
-        self::checkParam('deliveryPhone', '17');
-        self::checkParam('deliveryAddr', '18');
-        self::checkParam('deliveryCity', '19');
-        self::checkParam('deliveryState', '20');
-        self::checkParam('deliveryPostCd', '21');
-        self::checkParam('deliveryCountry', '22');
-        self::checkParam('dbProcessUrl', '23');
-        self::checkParam('notaxAmt', '26');
-        self::checkParam('description', '27');
-        self::checkParam('merchantToken', '28');
-        self::checkParam('reqDt', '29');
-        self::checkParam('reqTm', '30');
-        self::checkParam('userIP', '34');
-        self::checkParam('cartData', '38');
+        $this->checkParam('timeStamp', '01');
+        $this->checkParam('iMid', '02');
+        $this->checkParam('payMethod', '03');
+        $this->checkParam('currency', '04');
+        $this->checkParam('amt', '05');
+        $this->checkParam('referenceNo', '06');
+        $this->checkParam('goodsNm', '07');
+        $this->checkParam('billingNm', '08');
+        $this->checkParam('billingPhone', '09');
+        $this->checkParam('billingEmail', '10');
+        $this->checkParam('billingAddr', '11');
+        $this->checkParam('billingCity', '12');
+        $this->checkParam('billingState', '13');
+        $this->checkParam('billingPostCd', '14');
+        $this->checkParam('billingCountry', '15');
+        $this->checkParam('deliveryNm', '16');
+        $this->checkParam('deliveryPhone', '17');
+        $this->checkParam('deliveryAddr', '18');
+        $this->checkParam('deliveryCity', '19');
+        $this->checkParam('deliveryState', '20');
+        $this->checkParam('deliveryPostCd', '21');
+        $this->checkParam('deliveryCountry', '22');
+        $this->checkParam('dbProcessUrl', '23');
+        $this->checkParam('notaxAmt', '26');
+        $this->checkParam('description', '27');
+        $this->checkParam('merchantToken', '28');
+        $this->checkParam('reqDt', '29');
+        $this->checkParam('reqTm', '30');
+        $this->checkParam('userIP', '34');
+        $this->checkParam('cartData', '38');
 
         // Send Request
-        $resultData = NicepayRequestor::apiRequest(NicepayConfig::NICEPAY_REQ_URL, self::$requestData);
-        unset(self::$requestData);
+        $resultData = $this->request->apiRequest(NicepayConfig::NICEPAY_REQ_URL, $this->requestData);
+        unset($this->requestData);
 
         return $resultData;
     }
 
     // Check Payment Status
-    public static function checkPaymentStatus($tXid, $referenceNo, $amt)
+    public function checkPaymentStatus($tXid, $referenceNo, $amt)
     {
         // Populate data
-        self::set('timeStamp', date('YmdHis'));
-        self::set('iMid', self::getMerchantId());
-        self::set('referenceNo', $referenceNo);
-        self::set('tXid', $tXid);
-        self::set('amt', $amt);
-        self::set('merchantKey', self::getMerchantKey());
-        self::set('merchantToken', self::getMerchantToken());
-        unset(self::$requestData['merchantKey']);
+        $this->set('timeStamp', date('YmdHis'));
+        $this->set('iMid', $this->getMerchantId());
+        $this->set('referenceNo', $referenceNo);
+        $this->set('tXid', $tXid);
+        $this->set('amt', $amt);
+        $this->set('merchantKey', $this->getMerchantKey());
+        $this->set('merchantToken', $this->getMerchantToken());
+        unset($this->requestData['merchantKey']);
 
         // Check Parameter
-        self::checkParam('timeStamp', '01');
-        self::checkParam('tXid', '30');
-        self::checkParam('iMid', '02');
-        self::checkParam('referenceNo', '06');
-        self::checkParam('amt', '05');
-        self::checkParam('merchantToken', '28');
+        $this->checkParam('timeStamp', '01');
+        $this->checkParam('tXid', '30');
+        $this->checkParam('iMid', '02');
+        $this->checkParam('referenceNo', '06');
+        $this->checkParam('amt', '05');
+        $this->checkParam('merchantToken', '28');
 
         // Send Request
-        $resultData = NicepayRequestor::apiRequest(NicepayConfig::NICEPAY_ORDER_STATUS_URL, self::$requestData);
-        unset(self::$requestData);
+        $resultData = $this->request->apiRequest(NicepayConfig::NICEPAY_ORDER_STATUS_URL, $this->requestData);
+        unset($this->requestData);
 
         return $resultData;
     }
 
     // Cancel Transaction
-    public static function cancelTrans($tXid, $amt)
+    public function cancelTrans($tXid, $amt)
     {
         // Populate data
-        self::set('timeStamp', date('YmdHis'));
-        self::set('iMid', self::getMerchantId());
-        self::set('tXid', $tXid);
-        self::set('amt', $amt);
-        self::set('merchantKey', self::getMerchantKey());
-        self::set('merchantToken', self::getMerchantTokenCancel());
-        unset(self::$requestData['merchantKey']);
+        $this->set('timeStamp', date('YmdHis'));
+        $this->set('iMid', $this->getMerchantId());
+        $this->set('tXid', $tXid);
+        $this->set('amt', $amt);
+        $this->set('merchantKey', $this->getMerchantKey());
+        $this->set('merchantToken', $this->getMerchantTokenCancel());
+        unset($this->requestData['merchantKey']);
 
         // Check Parameter
-        self::checkParam('timeStamp', '01');
-        self::checkParam('tXid', '47');
-        self::checkParam('iMid', '02');
-        self::checkParam('referenceNo', '06');
-        self::checkParam('amt', '05');
-        self::checkParam('merchantToken', '28');
+        $this->checkParam('timeStamp', '01');
+        $this->checkParam('tXid', '47');
+        $this->checkParam('iMid', '02');
+        $this->checkParam('referenceNo', '06');
+        $this->checkParam('amt', '05');
+        $this->checkParam('merchantToken', '28');
 
         // Send Request
-        $resultData = NicepayRequestor::apiRequest(NicepayConfig::NICEPAY_CANCEL_URL, self::$requestData);
-        unset(self::$requestData);
+        $resultData = $this->request->apiRequest(NicepayConfig::NICEPAY_CANCEL_URL, $this->requestData);
+        unset($this->requestData);
 
         return $resultData;
     }
 
     // Request Payout
-    public static function requestPayout($amt, $accountNo)
+    public function requestPayout($amt, $accountNo)
     {
         // Populate data
-        self::set('timeStamp', date('YmdHis'));
-        self::set('iMid', self::getMerchantId());
-        self::set('amt', $amt);
-        self::set('accountNo', $accountNo);
-        self::set('merchantKey', self::getMerchantKey());
-        self::set('merchantToken', self::getMerchantTokenPayout());
-        unset(self::$requestData['merchantKey']);
+        $this->set('timeStamp', date('YmdHis'));
+        $this->set('iMid', $this->getMerchantId());
+        $this->set('amt', $amt);
+        $this->set('accountNo', $accountNo);
+        $this->set('merchantKey', $this->getMerchantKey());
+        $this->set('merchantToken', $this->getMerchantTokenPayout());
+        unset($this->requestData['merchantKey']);
 
         // Send Request
-        $resultData = NicepayRequestor::apiRequest(NicepayConfig::NICEPAY_REQ_PAYOUT_URL, self::$requestData);
-        unset(self::$requestData);
+        $resultData = $this->request->apiRequest(NicepayConfig::NICEPAY_REQ_PAYOUT_URL, $this->requestData);
+        unset($this->requestData);
 
         return $resultData;
     }
 
     // Approve Payout
-    public static function approvePayout($tXid)
+    public function approvePayout($tXid)
     {
         // Populate data
-        self::set('timeStamp', date('YmdHis'));
-        self::set('iMid', self::getMerchantId());
-        self::set('tXid', $tXid);
-        self::set('merchantKey', self::getMerchantKey());
-        self::set('merchantToken', self::getMerchantTokenApprovePayout());
-        unset(self::$requestData['merchantKey']);
+        $this->set('timeStamp', date('YmdHis'));
+        $this->set('iMid', $this->getMerchantId());
+        $this->set('tXid', $tXid);
+        $this->set('merchantKey', $this->getMerchantKey());
+        $this->set('merchantToken', $this->getMerchantTokenApprovePayout());
+        unset($this->requestData['merchantKey']);
 
         // Send Request
-        $resultData = NicepayRequestor::apiRequest(NicepayConfig::NICEPAY_APPROVE_PAYOUT_URL, self::$requestData);
-        unset(self::$requestData);
+        $resultData = $this->request->apiRequest(NicepayConfig::NICEPAY_APPROVE_PAYOUT_URL, $this->requestData);
+        unset($this->requestData);
 
         return $resultData;
     }
 
     // Reject Payout
-    public static function rejectPayout($tXid)
+    public function rejectPayout($tXid)
     {
         // Populate data
-        self::set('timeStamp', date('YmdHis'));
-        self::set('iMid', self::getMerchantId());
-        self::set('tXid', $tXid);
-        self::set('merchantKey', self::getMerchantKey());
-        self::set('merchantToken', self::getMerchantTokenRejectPayout());
-        unset(self::$requestData['merchantKey']);
+        $this->set('timeStamp', date('YmdHis'));
+        $this->set('iMid', $this->getMerchantId());
+        $this->set('tXid', $tXid);
+        $this->set('merchantKey', $this->getMerchantKey());
+        $this->set('merchantToken', $this->getMerchantTokenRejectPayout());
+        unset($this->requestData['merchantKey']);
 
         // Send Request
-        $resultData = NicepayRequestor::apiRequest(NicepayConfig::NICEPAY_REJECT_PAYOUT_URL, self::$requestData);
-        unset(self::$requestData);
+        $resultData = $this->request->apiRequest(NicepayConfig::NICEPAY_REJECT_PAYOUT_URL, $this->requestData);
+        unset($this->requestData);
 
         return $resultData;
     }
 
     // Inquiry Payout
-    public static function inquiryPayout($tXid, $accountNo)
+    public function inquiryPayout($tXid, $accountNo)
     {
         // Populate data
-        self::set('timeStamp', date('YmdHis'));
-        self::set('iMid', self::getMerchantId());
-        self::set('tXid', $tXid);
-        self::set('accountNo', $accountNo);
-        self::set('merchantKey', self::getMerchantKey());
-        self::set('merchantToken', self::getMerchantTokenInquiryPayout());
-        unset(self::$requestData['merchantKey']);
+        $this->set('timeStamp', date('YmdHis'));
+        $this->set('iMid', $this->getMerchantId());
+        $this->set('tXid', $tXid);
+        $this->set('accountNo', $accountNo);
+        $this->set('merchantKey', $this->getMerchantKey());
+        $this->set('merchantToken', $this->getMerchantTokenInquiryPayout());
+        unset($this->requestData['merchantKey']);
 
         // Send Request
-        $resultData = NicepayRequestor::apiRequest(NicepayConfig::NICEPAY_INQUIRY_PAYOUT_URL, self::$requestData);
-        unset(self::$requestData);
+        $resultData = $this->request->apiRequest(NicepayConfig::NICEPAY_INQUIRY_PAYOUT_URL, $this->requestData);
+        unset($this->requestData);
 
         return $resultData;
     }
 
     // Check Balance
-    public static function balanceInquiry()
+    public function balanceInquiry()
     {
         // Populate data
-        self::set('timeStamp', date('YmdHis'));
-        self::set('iMid', self::getMerchantId());
-        self::set('merchantKey', self::getMerchantKey());
-        self::set('merchantToken', self::getMerchantTokenBalance());
-        unset(self::$requestData['merchantKey']);
+        $this->set('timeStamp', date('YmdHis'));
+        $this->set('iMid', $this->getMerchantId());
+        $this->set('merchantKey', $this->getMerchantKey());
+        $this->set('merchantToken', $this->getMerchantTokenBalance());
+        unset($this->requestData['merchantKey']);
 
         // Send Request
-        $resultData = NicepayRequestor::apiRequest(NicepayConfig::NICEPAY_BALANCE_PAYOUT_URL, self::$requestData);
-        unset(self::$requestData);
+        $resultData = $this->request->apiRequest(NicepayConfig::NICEPAY_BALANCE_PAYOUT_URL, $this->requestData);
+        unset($this->requestData);
 
         return $resultData;
     }
 
     // Cancel Payout
-    public static function cancelPayout($tXid)
+    public function cancelPayout($tXid)
     {
         // Populate data
-        self::set('timeStamp', date('YmdHis'));
-        self::set('iMid', self::getMerchantId());
-        self::set('tXid', $tXid);
-        self::set('merchantKey', self::getMerchantKey());
-        self::set('merchantToken', self::getMerchantTokenCancelPayout());
-        unset(self::$requestData['merchantKey']);
+        $this->set('timeStamp', date('YmdHis'));
+        $this->set('iMid', $this->getMerchantId());
+        $this->set('tXid', $tXid);
+        $this->set('merchantKey', $this->getMerchantKey());
+        $this->set('merchantToken', $this->getMerchantTokenCancelPayout());
+        unset($this->requestData['merchantKey']);
 
         // Send Request
-        $resultData = NicepayRequestor::apiRequest(NicepayConfig::NICEPAY_CANCEL_PAYOUT_URL, self::$requestData);
-        unset(self::$requestData);
+        $resultData = $this->request->apiRequest(NicepayConfig::NICEPAY_CANCEL_PAYOUT_URL, $this->requestData);
+        unset($this->requestData);
 
         return $resultData;
     }

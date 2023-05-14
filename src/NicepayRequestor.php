@@ -43,14 +43,14 @@ class NicepayRequestor
         return true;
     }
 
-    public static function apiRequest($apiUrl, $data)
+    public function apiRequest($apiUrl, $data)
     {
-        self::openSocket($apiUrl);
+        $this->openSocket($apiUrl);
 
         $host = parse_url($apiUrl, PHP_URL_HOST);
         $uri = parse_url($apiUrl, PHP_URL_PATH);
-        self::$headers = "";
-        self::$body = "";
+        $this->headers = "";
+        $this->body = "";
         $postdata = json_encode($data);
 
         /* Write */
@@ -63,18 +63,18 @@ class NicepayRequestor
         $request .= "\r\n";
         $request .= $postdata . "\r\n";
         $request .= "\r\n";
-        if (self::$sock) {
-            fwrite(self::$sock, $request);
+        if ($this->sock) {
+            fwrite($this->sock, $request);
 
             /* Read */
-            stream_set_blocking(self::$sock, FALSE);
+            stream_set_blocking($this->sock, FALSE);
 
             $atStart = true;
             $IsHeader = true;
             $timeout = false;
             $start_time = time();
-            while (!feof(self::$sock) && !$timeout) {
-                $line = fgets(self::$sock, 4096);
+            while (!feof($this->sock) && !$timeout) {
+                $line = fgets($this->sock, 4096);
                 $diff = time() - $start_time;
                 if ($diff >= NicepayConfig::NICEPAY_TIMEOUT_READ) {
                     $timeout = true;
@@ -89,37 +89,37 @@ class NicepayRequestor
                         $IsHeader = false;
                         continue;
                     }
-                    self::$headers .= $line;
+                    $this->headers .= $line;
                     if ($atStart) {
                         $atStart = false;
                         if (!preg_match('/HTTP\/(\\d\\.\\d)\\s*(\\d+)\\s*(.*)/', $line, $m)) {
-                            self::$errormsg = "Status code line invalid: " . htmlentities($line);
-                            fclose(self::$sock);
+                            $this->errormsg = "Status code line invalid: " . htmlentities($line);
+                            fclose($this->sock);
                             return false;
                         }
                         $http_version = $m[1];
-                        self::$status = $m[2];
+                        $this->status = $m[2];
                         $status_string = $m[3];
                         continue;
                     }
                 } else {
-                    self::$body .= $line;
+                    $this->body .= $line;
                 }
             }
-            fclose(self::$sock);
+            fclose($this->sock);
 
             if ($timeout) {
-                self::$errorcode = NicepayConfig::NICEPAY_READ_TIMEOUT_ERR;
-                self::$errormsg = "Socket Timeout(" . $diff . "SEC)";
+                $this->errorcode = NicepayConfig::NICEPAY_READ_TIMEOUT_ERR;
+                $this->errormsg = "Socket Timeout(" . $diff . "SEC)";
                 return false;
             }
 
-            if (!self::parseResult(self::$body)) {
-                self::$body =   substr(self::$body, 4);
+            if (!$this->parseResult($this->body)) {
+                $this->body = substr($this->body, 4);
 
-                return self::parseResult(self::$body);
+                return $this->parseResult($this->body);
             }
-            return self::parseResult(self::$body);
+            return $this->parseResult($this->body);
         } else {
             // echo "Connection Timeout. Please retry.";
             return false;
