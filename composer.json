@@ -1,0 +1,55 @@
+{
+    "name": "khidirdotid/nicepay-laravel",
+    "type": "library",
+    "description": "A Nicepay Wrapper for Laravel",
+    "keywords": [
+        "nicepay",
+        "laravel"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Khidir Zahid",
+            "email": "khidirdotid@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "illuminate/support": "^10.0"
+    },
+    "require-dev": {
+        "nunomaduro/collision": "^7.0",
+        "phpunit/phpunit": "^10.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "KhidirDotID\\Nicepay\\": "src/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "KhidirDotID\\Nicepay\\Providers\\NicepayServiceProvider"
+            ],
+            "aliases": {
+                "Nicepay": "KhidirDotID\\Nicepay\\Facades\\Nicepay"
+            }
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "funding": [
+        {
+            "type": "saweria",
+            "url": "https://saweria.co/khidirdotid"
+        }
+    ]
+}
