@@ -7,10 +7,11 @@ use KhidirDotID\Nicepay\NicepayRequestor;
 
 class NicepayLib extends NicepayConfig
 {
+    public $error;
+    public $request;
+
     public $requestData = [];
     public $notification = [];
-
-    public $request;
 
     public function __construct()
     {
@@ -66,7 +67,7 @@ class NicepayLib extends NicepayConfig
             $this->set('vat', '0');
         }
         if ($this->get('cartData') == '') {
-            $this->set('cartData', "{\"count\": \"1\",\"item\": [{\"img_url\": \"https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone11-select-2019-family?wid=882&amp;hei=1058&amp;fmt=jpeg&amp;qlt=80&amp;op_usm=0.5,0.5&amp;.v=1567022175704\",\"goods_name\": \" iPhone 11 \",\"goods_detail\": \"A new dual‑camera system captures more of what you see and love. The fastest chip ever in a smartphone and all‑day battery life let you do more and charge less. And the highest‑quality video in a smartphone, so your memories look better than ever.\",\"goods_amt\":" . "\"" . $this->get('amt') . "\"}]}");
+            $this->set('cartData', '{"count": 1, "item": [{"img_url": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone11-select-2019-family?wid=882&amp;hei=1058&amp;fmt=jpeg&amp;qlt=80&amp;op_usm=0.5,0.5&amp;.v=1567022175704", "goods_name": "iPhone 11", "goods_detail": "A new dual‑camera system captures more of what you see and love. The fastest chip ever in a smartphone and all‑day battery life let you do more and charge less. And the highest‑quality video in a smartphone, so your memories look better than ever.", "goods_amt": ' . $this->get('amt') . '}]}');
         }
 
         // Check Parameter
@@ -102,6 +103,8 @@ class NicepayLib extends NicepayConfig
         $this->checkParam('reqTm', '30');
         $this->checkParam('userIP', '34');
         $this->checkParam('cartData', '38');
+
+        if ($this->error) return $this->error;
 
         // Send Request
         $resultData = $this->request->apiRequest(NicepayConfig::NICEPAY_REQ_URL, $this->requestData);
@@ -177,6 +180,8 @@ class NicepayLib extends NicepayConfig
         $this->checkParam('vacctValidDt', '43');
         $this->checkParam('vacctValidTm', '44');
 
+        if ($this->error) return $this->error;
+
         // Send Request
         $resultData = $this->request->apiRequest(NicepayConfig::NICEPAY_REQ_URL, $this->requestData);
         unset($this->requestData);
@@ -204,13 +209,13 @@ class NicepayLib extends NicepayConfig
         $this->set('notaxAmt', '0');
         $this->set('reqDomain', 'http://localhost/');
 
-        if ($this->get('fee') == "") {
+        if ($this->get('fee') == '') {
             $this->set('fee', '0');
         }
-        if ($this->get('vat') == "") {
+        if ($this->get('vat') == '') {
             $this->set('vat', '0');
         }
-        if ($this->get('cartData') == "") {
+        if ($this->get('cartData') == '') {
             $this->set('cartData', '{}');
         }
 
@@ -251,145 +256,7 @@ class NicepayLib extends NicepayConfig
         $this->checkParam('payValidDt', '43');
         $this->checkParam('payValidTm', '44');
 
-        // Send Request
-        $resultData = $this->request->apiRequest(NicepayConfig::NICEPAY_REQ_URL, $this->requestData);
-        unset($this->requestData);
-
-        return $resultData;
-    }
-
-    // Request Ewallet
-    public function requestEWallet($requestData)
-    {
-        // Populate data
-        foreach ($requestData as $key => $value) {
-            $this->set($key, $value);
-        }
-        $this->set('timeStamp', date('YmdHis'));
-        $this->set('iMid', $this->getMerchantId());
-        $this->set('merchantKey', $this->getMerchantKey());
-        $this->set('merchantToken', $this->getMerchantToken());
-        unset($this->requestData['merchantKey']);
-
-        $this->set('dbProcessUrl', $this->getNotificationUrl());
-        // $this->set('callBackUrl', $this->getCallbackUrl());
-        $this->set('userIP', $this->getUserIP());
-        $this->set('goodsNm', $this->get('description'));
-        $this->set('notaxAmt', '0');
-        $this->set('reqDomain', 'http://localhost/');
-
-        if ($this->get('fee') == "") {
-            $this->set('fee', '0');
-        }
-        if ($this->get('vat') == "") {
-            $this->set('vat', '0');
-        }
-        if ($this->get('cartData') == "") {
-            if ($this->get('mitraCd') == "OVOE") {
-                $this->set('cartData', "{\"count\": \"1\",\"item\": [{\"img_url\": \"https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone11-select-2019-family?wid=882&amp;hei=1058&amp;fmt=jpeg&amp;qlt=80&amp;op_usm=0.5,0.5&amp;.v=1567022175704\",\"goods_name\": \" iPhone 11 \",\"goods_detail\": \"A new dual‑camera system captures more of what you see and love. The fastest chip ever in a smartphone and all‑day battery life let you do more and charge less. And the highest‑quality video in a smartphone, so your memories look better than ever.\",\"goods_amt\":" . "\"" . $this->get('amt') . "\"}]}");
-            } elseif ($this->get('mitraCd') == "DANA") {
-                $this->set('cartData', "{\"count\": \"1\",\"item\": [{\"img_url\": \"https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone11-select-2019-family?wid=882&amp;hei=1058&amp;fmt=jpeg&amp;qlt=80&amp;op_usm=0.5,0.5&amp;.v=1567022175704\",\"goods_name\": \" iPhone 11 \",\"goods_quantity\": \"1\",\"goods_detail\": \"A new dual‑camera system captures more of what you see and love. The fastest chip ever in a smartphone and all‑day battery life let you do more and charge less. And the highest‑quality video in a smartphone, so your memories look better than ever.\",\"goods_amt\":" . "\"" . $this->get('amt') . "\"}]}");
-            } elseif ($this->get('mitraCd') == "LINK") {
-                $this->set('cartData', "{\"count\": \"1\",\"item\": [{\"img_url\": \"https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone11-select-2019-family?wid=882&amp;hei=1058&amp;fmt=jpeg&amp;qlt=80&amp;op_usm=0.5,0.5&amp;.v=1567022175704\",\"goods_name\": \" iPhone 11 \",\"goods_quantity\": \"1\",\"goods_detail\": \"A new dual‑camera system captures more of what you see and love. The fastest chip ever in a smartphone and all‑day battery life let you do more and charge less. And the highest‑quality video in a smartphone, so your memories look better than ever.\",\"goods_amt\":" . "\"" . $this->get('amt') . "\"}]}");
-            } elseif ($this->get('mitraCd') == "ESHP") {
-                $this->set('cartData', "{\"count\": \"1\",\"item\": [{\"img_url\": \"https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone11-select-2019-family?wid=882&amp;hei=1058&amp;fmt=jpeg&amp;qlt=80&amp;op_usm=0.5,0.5&amp;.v=1567022175704\",\"goods_name\": \" iPhone 11 \",\"goods_quantity\": \"1\",\"goods_detail\": \"A new dual‑camera system captures more of what you see and love. The fastest chip ever in a smartphone and all‑day battery life let you do more and charge less. And the highest‑quality video in a smartphone, so your memories look better than ever.\",\"goods_amt\":" . "\"" . $this->get('amt') . "\"}]}");
-            }
-        }
-
-        // Check Parameter
-        $this->checkParam('timeStamp', '01');
-        $this->checkParam('iMid', '02');
-        $this->checkParam('payMethod', '03');
-        $this->checkParam('currency', '04');
-        $this->checkParam('amt', '05');
-        $this->checkParam('referenceNo', '06');
-        $this->checkParam('goodsNm', '07');
-        $this->checkParam('billingNm', '08');
-        $this->checkParam('billingPhone', '09');
-        $this->checkParam('billingEmail', '10');
-        $this->checkParam('billingAddr', '11');
-        $this->checkParam('billingCity', '12');
-        $this->checkParam('billingState', '13');
-        $this->checkParam('billingPostCd', '14');
-        $this->checkParam('billingCountry', '15');
-        $this->checkParam('cartData', '38');
-        $this->checkParam('mitraCd', '36');
-        $this->checkParam('userIP', '34');
-        $this->checkParam('dbProcessUrl', '23');
-        $this->checkParam('merchantToken', '28');
-
-        // Send Request
-        $resultData = $this->request->apiRequest(NicepayConfig::NICEPAY_REQ_URL, $this->requestData);
-        unset($this->requestData);
-
-        return $resultData;
-    }
-
-    // Request QRIS
-    public function requestQris($requestData)
-    {
-        // Populate data
-        foreach ($requestData as $key => $value) {
-            $this->set($key, $value);
-        }
-        $this->set('timeStamp', date('YmdHis'));
-        $this->set('iMid', $this->getMerchantId());
-        $this->set('merchantKey', $this->getMerchantKey());
-        $this->set('merchantToken', $this->getMerchantToken());
-        unset($this->requestData['merchantKey']);
-
-        $this->set('dbProcessUrl', $this->getNotificationUrl());
-        // $this->set('callBackUrl', $this->getCallbackUrl());
-        $this->set('userIP', $this->getUserIP());
-        $this->set('goodsNm', $this->get('description'));
-        $this->set('notaxAmt', '0');
-        $this->set('reqDomain', 'http://localhost/');
-
-        if ($this->get('fee') == "") {
-            $this->set('fee', '0');
-        }
-        if ($this->get('vat') == "") {
-            $this->set('vat', '0');
-        }
-        if ($this->get('cartData') == "") {
-            $this->set('cartData', '{}');
-        }
-
-        // Check Parameter
-        $this->checkParam('timeStamp', '01');
-        $this->checkParam('iMid', '02');
-        $this->checkParam('payMethod', '03');
-        $this->checkParam('currency', '04');
-        $this->checkParam('amt', '05');
-        $this->checkParam('referenceNo', '06');
-        $this->checkParam('goodsNm', '07');
-        $this->checkParam('billingNm', '08');
-        $this->checkParam('billingPhone', '09');
-        $this->checkParam('billingEmail', '10');
-        $this->checkParam('billingAddr', '11');
-        $this->checkParam('billingCity', '12');
-        $this->checkParam('billingState', '13');
-        $this->checkParam('billingPostCd', '14');
-        $this->checkParam('billingCountry', '15');
-        $this->checkParam('deliveryNm', '16');
-        $this->checkParam('deliveryPhone', '17');
-        $this->checkParam('deliveryAddr', '18');
-        $this->checkParam('deliveryCity', '19');
-        $this->checkParam('deliveryState', '20');
-        $this->checkParam('deliveryPostCd', '21');
-        $this->checkParam('deliveryCountry', '22');
-        $this->checkParam('dbProcessUrl', '23');
-        $this->checkParam('vat', '24');
-        $this->checkParam('fee', '25');
-        $this->checkParam('notaxAmt', '26');
-        $this->checkParam('description', '27');
-        $this->checkParam('merchantToken', '28');
-        $this->checkParam('reqDt', '29');
-        $this->checkParam('reqTm', '30');
-        $this->checkParam('userIP', '34');
-        $this->checkParam('cartData', '35');
-        $this->checkParam('mitraCd', '36');
-        $this->checkParam('shopId', '37');
+        if ($this->error) return $this->error;
 
         // Send Request
         $resultData = $this->request->apiRequest(NicepayConfig::NICEPAY_REQ_URL, $this->requestData);
@@ -418,13 +285,13 @@ class NicepayLib extends NicepayConfig
         $this->set('notaxAmt', '0');
         $this->set('reqDomain', 'http://localhost/');
 
-        if ($this->get('fee') == "") {
+        if ($this->get('fee') == '') {
             $this->set('fee', '0');
         }
-        if ($this->get('vat') == "") {
+        if ($this->get('vat') == '') {
             $this->set('vat', '0');
         }
-        if ($this->get('cartData') == "") {
+        if ($this->get('cartData') == '') {
             $this->set('cartData', '{}');
         }
 
@@ -464,6 +331,77 @@ class NicepayLib extends NicepayConfig
         $this->checkParam('mitraCd', '36');
         // $this->checkParam('cashtag', '37');
 
+        if ($this->error) return $this->error;
+
+        // Send Request
+        $resultData = $this->request->apiRequest(NicepayConfig::NICEPAY_REQ_URL, $this->requestData);
+        unset($this->requestData);
+
+        return $resultData;
+    }
+
+    // Request Ewallet
+    public function requestEWallet($requestData)
+    {
+        // Populate data
+        foreach ($requestData as $key => $value) {
+            $this->set($key, $value);
+        }
+        $this->set('timeStamp', date('YmdHis'));
+        $this->set('iMid', $this->getMerchantId());
+        $this->set('merchantKey', $this->getMerchantKey());
+        $this->set('merchantToken', $this->getMerchantToken());
+        unset($this->requestData['merchantKey']);
+
+        $this->set('dbProcessUrl', $this->getNotificationUrl());
+        // $this->set('callBackUrl', $this->getCallbackUrl());
+        $this->set('userIP', $this->getUserIP());
+        $this->set('goodsNm', $this->get('description'));
+        $this->set('notaxAmt', '0');
+        $this->set('reqDomain', 'http://localhost/');
+
+        if ($this->get('fee') == '') {
+            $this->set('fee', '0');
+        }
+        if ($this->get('vat') == '') {
+            $this->set('vat', '0');
+        }
+        if ($this->get('cartData') == '') {
+            if ($this->get('mitraCd') == 'OVOE') {
+                $this->set('cartData', '{"count": 1, "item": [{"img_url": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone11-select-2019-family?wid=882&amp;hei=1058&amp;fmt=jpeg&amp;qlt=80&amp;op_usm=0.5,0.5&amp;.v=1567022175704", "goods_name": "iPhone 11", "goods_detail": "A new dual‑camera system captures more of what you see and love. The fastest chip ever in a smartphone and all‑day battery life let you do more and charge less. And the highest‑quality video in a smartphone, so your memories look better than ever.", "goods_amt": ' . $this->get('amt') . '}]}');
+            } elseif ($this->get('mitraCd') == 'DANA') {
+                $this->set('cartData', '{"count": 1, "item": [{"img_url": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone11-select-2019-family?wid=882&amp;hei=1058&amp;fmt=jpeg&amp;qlt=80&amp;op_usm=0.5,0.5&amp;.v=1567022175704", "goods_name": "iPhone 11", "goods_quantity": 1, "goods_detail": "A new dual‑camera system captures more of what you see and love. The fastest chip ever in a smartphone and all‑day battery life let you do more and charge less. And the highest‑quality video in a smartphone, so your memories look better than ever.", "goods_amt": ' . $this->get('amt') . '}]}');
+            } elseif ($this->get('mitraCd') == 'LINK') {
+                $this->set('cartData', '{"count": 1, "item": [{"img_url": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone11-select-2019-family?wid=882&amp;hei=1058&amp;fmt=jpeg&amp;qlt=80&amp;op_usm=0.5,0.5&amp;.v=1567022175704", "goods_name": "iPhone 11", "goods_quantity": 1, "goods_detail": "A new dual‑camera system captures more of what you see and love. The fastest chip ever in a smartphone and all‑day battery life let you do more and charge less. And the highest‑quality video in a smartphone, so your memories look better than ever.", "goods_amt": ' . $this->get('amt') . '}]}');
+            } elseif ($this->get('mitraCd') == 'ESHP') {
+                $this->set('cartData', '{"count": 1, "item": [{"img_url": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone11-select-2019-family?wid=882&amp;hei=1058&amp;fmt=jpeg&amp;qlt=80&amp;op_usm=0.5,0.5&amp;.v=1567022175704", "goods_name": "iPhone 11", "goods_quantity": 1, "goods_detail": "A new dual‑camera system captures more of what you see and love. The fastest chip ever in a smartphone and all‑day battery life let you do more and charge less. And the highest‑quality video in a smartphone, so your memories look better than ever.", "goods_amt": ' . $this->get('amt') . '}]}');
+            }
+        }
+
+        // Check Parameter
+        $this->checkParam('timeStamp', '01');
+        $this->checkParam('iMid', '02');
+        $this->checkParam('payMethod', '03');
+        $this->checkParam('currency', '04');
+        $this->checkParam('amt', '05');
+        $this->checkParam('referenceNo', '06');
+        $this->checkParam('goodsNm', '07');
+        $this->checkParam('billingNm', '08');
+        $this->checkParam('billingPhone', '09');
+        $this->checkParam('billingEmail', '10');
+        $this->checkParam('billingAddr', '11');
+        $this->checkParam('billingCity', '12');
+        $this->checkParam('billingState', '13');
+        $this->checkParam('billingPostCd', '14');
+        $this->checkParam('billingCountry', '15');
+        $this->checkParam('cartData', '38');
+        $this->checkParam('mitraCd', '36');
+        $this->checkParam('userIP', '34');
+        $this->checkParam('dbProcessUrl', '23');
+        $this->checkParam('merchantToken', '28');
+
+        if ($this->error) return $this->error;
+
         // Send Request
         $resultData = $this->request->apiRequest(NicepayConfig::NICEPAY_REQ_URL, $this->requestData);
         unset($this->requestData);
@@ -490,10 +428,10 @@ class NicepayLib extends NicepayConfig
         $this->set('notaxAmt', '0');
         $this->set('reqDomain', 'http://localhost/');
 
-        if ($this->get('fee') == "") {
+        if ($this->get('fee') == '') {
             $this->set('fee', '0');
         }
-        if ($this->get('vat') == "") {
+        if ($this->get('vat') == '') {
             $this->set('vat', '0');
         }
 
@@ -529,6 +467,83 @@ class NicepayLib extends NicepayConfig
         $this->checkParam('userIP', '34');
         $this->checkParam('cartData', '38');
 
+        if ($this->error) return $this->error;
+
+        // Send Request
+        $resultData = $this->request->apiRequest(NicepayConfig::NICEPAY_REQ_URL, $this->requestData);
+        unset($this->requestData);
+
+        return $resultData;
+    }
+
+    // Request QRIS
+    public function requestQris($requestData)
+    {
+        // Populate data
+        foreach ($requestData as $key => $value) {
+            $this->set($key, $value);
+        }
+        $this->set('timeStamp', date('YmdHis'));
+        $this->set('iMid', $this->getMerchantId());
+        $this->set('merchantKey', $this->getMerchantKey());
+        $this->set('merchantToken', $this->getMerchantToken());
+        unset($this->requestData['merchantKey']);
+
+        $this->set('dbProcessUrl', $this->getNotificationUrl());
+        // $this->set('callBackUrl', $this->getCallbackUrl());
+        $this->set('userIP', $this->getUserIP());
+        $this->set('goodsNm', $this->get('description'));
+        $this->set('notaxAmt', '0');
+        $this->set('reqDomain', 'http://localhost/');
+
+        if ($this->get('fee') == '') {
+            $this->set('fee', '0');
+        }
+        if ($this->get('vat') == '') {
+            $this->set('vat', '0');
+        }
+        if ($this->get('cartData') == '') {
+            $this->set('cartData', '{}');
+        }
+
+        // Check Parameter
+        $this->checkParam('timeStamp', '01');
+        $this->checkParam('iMid', '02');
+        $this->checkParam('payMethod', '03');
+        $this->checkParam('currency', '04');
+        $this->checkParam('amt', '05');
+        $this->checkParam('referenceNo', '06');
+        $this->checkParam('goodsNm', '07');
+        $this->checkParam('billingNm', '08');
+        $this->checkParam('billingPhone', '09');
+        $this->checkParam('billingEmail', '10');
+        $this->checkParam('billingAddr', '11');
+        $this->checkParam('billingCity', '12');
+        $this->checkParam('billingState', '13');
+        $this->checkParam('billingPostCd', '14');
+        $this->checkParam('billingCountry', '15');
+        $this->checkParam('deliveryNm', '16');
+        $this->checkParam('deliveryPhone', '17');
+        $this->checkParam('deliveryAddr', '18');
+        $this->checkParam('deliveryCity', '19');
+        $this->checkParam('deliveryState', '20');
+        $this->checkParam('deliveryPostCd', '21');
+        $this->checkParam('deliveryCountry', '22');
+        $this->checkParam('dbProcessUrl', '23');
+        $this->checkParam('vat', '24');
+        $this->checkParam('fee', '25');
+        $this->checkParam('notaxAmt', '26');
+        $this->checkParam('description', '27');
+        $this->checkParam('merchantToken', '28');
+        $this->checkParam('reqDt', '29');
+        $this->checkParam('reqTm', '30');
+        $this->checkParam('userIP', '34');
+        $this->checkParam('cartData', '35');
+        $this->checkParam('mitraCd', '36');
+        $this->checkParam('shopId', '37');
+
+        if ($this->error) return $this->error;
+
         // Send Request
         $resultData = $this->request->apiRequest(NicepayConfig::NICEPAY_REQ_URL, $this->requestData);
         unset($this->requestData);
@@ -557,6 +572,8 @@ class NicepayLib extends NicepayConfig
         $this->checkParam('amt', '05');
         $this->checkParam('merchantToken', '28');
 
+        if ($this->error) return $this->error;
+
         // Send Request
         $resultData = $this->request->apiRequest(NicepayConfig::NICEPAY_ORDER_STATUS_URL, $this->requestData);
         unset($this->requestData);
@@ -583,6 +600,8 @@ class NicepayLib extends NicepayConfig
         $this->checkParam('referenceNo', '06');
         $this->checkParam('amt', '05');
         $this->checkParam('merchantToken', '28');
+
+        if ($this->error) return $this->error;
 
         // Send Request
         $resultData = $this->request->apiRequest(NicepayConfig::NICEPAY_CANCEL_URL, $this->requestData);
@@ -702,8 +721,8 @@ class NicepayLib extends NicepayConfig
 
     public function checkParam($requestData, $errorNo)
     {
-        if (null == $this->get($requestData)) {
-            die($this->getError($errorNo));
+        if ($this->get($requestData) == null) {
+            $this->error = $this->getError($errorNo);
         }
     }
 
@@ -752,177 +771,177 @@ class NicepayLib extends NicepayConfig
         $error = [
             // That always Unknown Error :)
             '00' => [
-                'error'    => '00000',
-                'errorMsg' => 'Unknown error. Contact it.support@ionpay.net.'
+                'resultCd'  => '00000',
+                'resultMsg' => 'Unknown error. Contact it.support@ionpay.net.'
             ],
             // General Mandatory parameters
             '01' => [
-                'error'    => '10001',
-                'errorMsg' => '(timeStamp) is not set. Please set (timeStamp).'
+                'resultCd'  => '10001',
+                'resultMsg' => '(timeStamp) is not set. Please set (timeStamp).'
             ],
             '02' => [
-                'error'    => '10002',
-                'errorMsg' => '(iMid) is not set. Please set (iMid).'
+                'resultCd'  => '10002',
+                'resultMsg' => '(iMid) is not set. Please set (iMid).'
             ],
             '03' => [
-                'error'    => '10003',
-                'errorMsg' => '(payMethod) is not set. Please set (payMethod).'
+                'resultCd'  => '10003',
+                'resultMsg' => '(payMethod) is not set. Please set (payMethod).'
             ],
             '04' => [
-                'error'    => '10004',
-                'errorMsg' => '(currency) is not set. Please set (currency).'
+                'resultCd'  => '10004',
+                'resultMsg' => '(currency) is not set. Please set (currency).'
             ],
             '05' => [
-                'error'    => '10005',
-                'errorMsg' => '(amt) is not set. Please set (amt).'
+                'resultCd'  => '10005',
+                'resultMsg' => '(amt) is not set. Please set (amt).'
             ],
             '06' => [
-                'error'    => '10006',
-                'errorMsg' => '(referenceNo) is not set. Please set (referenceNo).'
+                'resultCd'  => '10006',
+                'resultMsg' => '(referenceNo) is not set. Please set (referenceNo).'
             ],
             '07' => [
-                'error'    => '10007',
-                'errorMsg' => '(goodsNm) is not set. Please set (goodsNm).'
+                'resultCd'  => '10007',
+                'resultMsg' => '(goodsNm) is not set. Please set (goodsNm).'
             ],
             '08' => [
-                'error'    => '10008',
-                'errorMsg' => '(billingNm) is not set. Please set (billingNm).'
+                'resultCd'  => '10008',
+                'resultMsg' => '(billingNm) is not set. Please set (billingNm).'
             ],
             '09' => [
-                'error'    => '10009',
-                'errorMsg' => '(billingPhone) is not set. Please set (billingPhone).'
+                'resultCd'  => '10009',
+                'resultMsg' => '(billingPhone) is not set. Please set (billingPhone).'
             ],
             '10' => [
-                'error'    => '10010',
-                'errorMsg' => '(billingEmail) is not set. Please set (billingEmail).'
+                'resultCd'  => '10010',
+                'resultMsg' => '(billingEmail) is not set. Please set (billingEmail).'
             ],
             '11' => [
-                'error'    => '10011',
-                'errorMsg' => '(billingAddr) is not set. Please set (billingAddr).'
+                'resultCd'  => '10011',
+                'resultMsg' => '(billingAddr) is not set. Please set (billingAddr).'
             ],
             '12' => [
-                'error'    => '10012',
-                'errorMsg' => '(billingCity) is not set. Please set (billingCity).'
+                'resultCd'  => '10012',
+                'resultMsg' => '(billingCity) is not set. Please set (billingCity).'
             ],
             '13' => [
-                'error'    => '10013',
-                'errorMsg' => '(billingState) is not set. Please set (billingState).'
+                'resultCd'  => '10013',
+                'resultMsg' => '(billingState) is not set. Please set (billingState).'
             ],
             '14' => [
-                'error'    => '10014',
-                'errorMsg' => '(billingPostCd) is not set. Please set (billingPostCd).'
+                'resultCd'  => '10014',
+                'resultMsg' => '(billingPostCd) is not set. Please set (billingPostCd).'
             ],
             '15' => [
-                'error'    => '10015',
-                'errorMsg' => '(billingCountry) is not set. Please set (billingCountry).'
+                'resultCd'  => '10015',
+                'resultMsg' => '(billingCountry) is not set. Please set (billingCountry).'
             ],
             '16' => [
-                'error'    => '10016',
-                'errorMsg' => '(deliveryNm) is not set. Please set (deliveryNm).'
+                'resultCd'  => '10016',
+                'resultMsg' => '(deliveryNm) is not set. Please set (deliveryNm).'
             ],
             '17' => [
-                'error'    => '10017',
-                'errorMsg' => '(deliveryPhone) is not set. Please set (deliveryPhone).'
+                'resultCd'  => '10017',
+                'resultMsg' => '(deliveryPhone) is not set. Please set (deliveryPhone).'
             ],
             '18' => [
-                'error'    => '10018',
-                'errorMsg' => '(deliveryAddr) is not set. Please set (deliveryAddr).'
+                'resultCd'  => '10018',
+                'resultMsg' => '(deliveryAddr) is not set. Please set (deliveryAddr).'
             ],
             '19' => [
-                'error'    => '10019',
-                'errorMsg' => '(deliveryCity) is not set. Please set (deliveryCity).'
+                'resultCd'  => '10019',
+                'resultMsg' => '(deliveryCity) is not set. Please set (deliveryCity).'
             ],
             '20' => [
-                'error'    => '10020',
-                'errorMsg' => '(deliveryState) is not set. Please set (deliveryState).'
+                'resultCd'  => '10020',
+                'resultMsg' => '(deliveryState) is not set. Please set (deliveryState).'
             ],
             '21' => [
-                'error'    => '10021',
-                'errorMsg' => '(deliveryPostCd) is not set. Please set (deliveryPostCd).'
+                'resultCd'  => '10021',
+                'resultMsg' => '(deliveryPostCd) is not set. Please set (deliveryPostCd).'
             ],
             '22' => [
-                'error'    => '10022',
-                'errorMsg' => '(deliveryCountry) is not set. Please set (deliveryCountry).'
+                'resultCd'  => '10022',
+                'resultMsg' => '(deliveryCountry) is not set. Please set (deliveryCountry).'
             ],
             '23' => [
-                'error'    => '10023',
-                'errorMsg' => '(dbProcessUrl) is not set. Please set (dbProcessUrl).'
+                'resultCd'  => '10023',
+                'resultMsg' => '(dbProcessUrl) is not set. Please set (dbProcessUrl).'
             ],
             '24' => [
-                'error'    => '10024',
-                'errorMsg' => '(vat) is not set. Please set (vat).'
+                'resultCd'  => '10024',
+                'resultMsg' => '(vat) is not set. Please set (vat).'
             ],
             '25' => [
-                'error'    => '10025',
-                'errorMsg' => '(fee) is not set. Please set (fee).'
+                'resultCd'  => '10025',
+                'resultMsg' => '(fee) is not set. Please set (fee).'
             ],
             '26' => [
-                'error'    => '10026',
-                'errorMsg' => '(notaxAmt) is not set. Please set (notaxAmt).'
+                'resultCd'  => '10026',
+                'resultMsg' => '(notaxAmt) is not set. Please set (notaxAmt).'
             ],
             '27' => [
-                'error'    => '10027',
-                'errorMsg' => '(description) is not set. Please set (description).'
+                'resultCd'  => '10027',
+                'resultMsg' => '(description) is not set. Please set (description).'
             ],
             '28' => [
-                'error'    => '10028',
-                'errorMsg' => '(merchantToken) is not set. Please set (merchantToken).'
+                'resultCd'  => '10028',
+                'resultMsg' => '(merchantToken) is not set. Please set (merchantToken).'
             ],
             '29' => [
-                'error'    => '10029',
-                'errorMsg' => '(reqDt) is not set. Please set (reqDt).'
+                'resultCd'  => '10029',
+                'resultMsg' => '(reqDt) is not set. Please set (reqDt).'
             ],
             '30' => [
-                'error'    => '10030',
-                'errorMsg' => '(reqTm) is not set. Please set (reqTm).'
+                'resultCd'  => '10030',
+                'resultMsg' => '(reqTm) is not set. Please set (reqTm).'
             ],
             '34' => [
-                'error'    => '10034',
-                'errorMsg' => '(userIP) is not set. Please set (userIP).'
+                'resultCd'  => '10034',
+                'resultMsg' => '(userIP) is not set. Please set (userIP).'
             ],
             '35' => [
-                'error'    => '10035',
-                'errorMsg' => '(cartData) is not set. Please set (cartData).'
+                'resultCd'  => '10035',
+                'resultMsg' => '(cartData) is not set. Please set (cartData).'
             ],
             '36' => [
-                'error'    => '10036',
-                'errorMsg' => '(mitraCd) is not set. Please set (mitraCd).'
+                'resultCd'  => '10036',
+                'resultMsg' => '(mitraCd) is not set. Please set (mitraCd).'
             ],
             '37' => [
-                'error'    => '10037',
-                'errorMsg' => '(shopId) is not set. Please set (shopId).'
+                'resultCd'  => '10037',
+                'resultMsg' => '(shopId) is not set. Please set (shopId).'
             ],
             '38' => [
-                'error'    => '10038',
-                'errorMsg' => '(cartData) is not set. Please set (cartData).'
+                'resultCd'  => '10038',
+                'resultMsg' => '(cartData) is not set. Please set (cartData).'
             ],
             '42' => [
-                'error'    => '10042',
-                'errorMsg' => '(bankCd) is not set. Please set (bankCd).'
+                'resultCd'  => '10042',
+                'resultMsg' => '(bankCd) is not set. Please set (bankCd).'
             ],
             '43' => [
-                'error'    => '10043',
-                'errorMsg' => '(payValidDt) is not set. Please set (payValidDt).'
+                'resultCd'  => '10043',
+                'resultMsg' => '(payValidDt) is not set. Please set (payValidDt).'
             ],
             '44' => [
-                'error'    => '10044',
-                'errorMsg' => '(payValidTm) is not set. Please set (payValidTm).'
+                'resultCd'  => '10044',
+                'resultMsg' => '(payValidTm) is not set. Please set (payValidTm).'
             ],
             '45' => [
-                'error'    => '10045',
-                'errorMsg' => '(vacctValidDt) is not set. Please set (vacctValidDt).'
+                'resultCd'  => '10045',
+                'resultMsg' => '(vacctValidDt) is not set. Please set (vacctValidDt).'
             ],
             '46' => [
-                'error'    => '10046',
-                'errorMsg' => '(vacctValidTm) is not set. Please set (vacctValidTm).'
+                'resultCd'  => '10046',
+                'resultMsg' => '(vacctValidTm) is not set. Please set (vacctValidTm).'
             ],
             // Mandatory parameters to Check Order Status
             '47' => [
-                'error'    => '10047',
-                'errorMsg' => '(tXid) is not set. Please set (tXid).'
+                'resultCd'  => '10047',
+                'resultMsg' => '(tXid) is not set. Please set (tXid).'
             ]
         ];
-        return (json_encode($this->oneLiner($error[$id])));
+        return (object)$error[$id];
     }
 
     public function getUserIP()
