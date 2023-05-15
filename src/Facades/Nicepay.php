@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Facade;
 /**
  * @method static string getMerchantId()
  * @method static string getMerchantKey()
+ * @method static string getMerchantToken()
  * @method static string getCallbackUrl()
  * @method static string getNotificationUrl()
  * @method static string get(string $name)
